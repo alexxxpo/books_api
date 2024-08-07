@@ -1,0 +1,26 @@
+{
+  "name": "books_api",
+  "version": "1.0.0",
+  "description": "RESTful API for control of book's collection",
+  "main": "app.js",
+  "scripts": {
+    "dev": "tsc "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexxxpo/books_api.git"
+  },
+  "author": "alexxxpo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexxxpo/books_api/issues"
+  },
+  "homepage": "https://github.com/alexxxpo/books_api#readme",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
