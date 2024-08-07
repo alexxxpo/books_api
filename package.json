@@ -4,7 +4,9 @@
   "description": "RESTful API for control of book's collection",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon src/app.ts"
+    "dev": "nodemon src/app.ts",
+    "build": "npx tsc",
+    "start": "node dist/app.js"
   },
   "repository": {
     "type": "git",
