@@ -1,6 +1,9 @@
 #node modules
 node_modules
 
+#database data
+data
+
 #Production
 dist
 
