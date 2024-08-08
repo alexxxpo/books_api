@@ -5,6 +5,12 @@ export type BookType = {
     publicationDate?: string;
 }
 
+export type UserType = {
+    username?: string;
+    email?: string;
+    password?: string;
+}
+
 export type ResErrorType = {
     error: string;
 }
