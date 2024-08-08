@@ -3,6 +3,7 @@ export type BookType = {
     title?: string;
     genres?: string;
     publicationDate?: string;
+    user?: AuthUser
 }
 
 export type UserType = {

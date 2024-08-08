@@ -91,3 +91,12 @@
     -- DB_PASSWORD - пароль для базы данных !обязательно!
     -- DB_USER - имя пользоваеля базы данных (по умолчанию postgres)
     -- DB_NAME - название базы данных (по умолчанию postgres)
+
+### Роуты для тестирования в postman
+localhost:3000/books
+localhost:3000/books/:id
+
+localhost:3000/users/register
+localhost:3000/users/login
+localhost:3000/users/me
+localhost:3000/users/:id/role

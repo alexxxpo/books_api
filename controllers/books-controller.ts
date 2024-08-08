@@ -84,7 +84,17 @@ export class BooksController {
 			})
 
 			if (!existBook) {
-				return res.status(400).json({ error: 'Такой книги не существует' })
+				return res.status(404).json({ error: 'Такой книги не существует' })
+			}
+
+			const existBookWithTitle = await prisma.book.findFirst({
+				where: {
+					title
+				}
+			})
+
+			if (existBookWithTitle && existBook.title !== existBookWithTitle.title) {
+				return res.status(400).json({ error: 'Книга с таким заголовком уже существует' })
 			}
 
 			const updateObject: BookType = {};
@@ -120,7 +130,7 @@ export class BooksController {
 				where: { id }
 			})
 
-			res.status(200).send('OK')
+			res.sendStatus(200)
 
 		} catch (error) {
 			console.error(error, 'Ошибка при удалении книги');

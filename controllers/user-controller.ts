@@ -3,6 +3,7 @@ import { AuthUser, UserType } from "../types";
 import { prisma } from '../prisma/prisma-client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { error } from 'console';
 
 class UserController {
     async register(req: Request<{}, {}, UserType>, res: Response) {
@@ -87,10 +88,40 @@ class UserController {
         return res.json(user)
     }
 
-    async changeRole(req: Request, res: Response) {
-        const { user } = req.body;
+    async changeRole(req: Request<{ id: number }, {}, { role: string, user: AuthUser }>, res: Response) {
+        const id = +req.params.id
 
-        const id = user.userId;
+        if (!req.body.role) return res.status(204).json({ message: 'Роль не изменена' })
+        const rights = Number.parseInt(req.body.role);
+
+        try {
+            const existRole = await prisma.roles.findUnique({
+                where: {
+                    rights
+                }
+            })
+
+            if (!existRole) return res.status(404).json({ error: 'Роль не существует' });
+
+            const existUser = await prisma.user.findUnique({
+                where: { id }
+            })
+
+            if (!existUser) return res.status(404).json({ error: 'Пользователь не найден' });
+
+            const updatedUser = await prisma.user.update({
+                where: { id },
+                data: { rights },
+            });
+
+            return res.status(200).json({ username: updatedUser.username, email: updatedUser.email, id: updatedUser.id, rights: updatedUser.rights });
+
+        } catch (error) {
+            console.error(error, 'Ошибка смены роли польователя');
+            res.status(500).json({ error: 'Internal server error' });
+        }
+
+
     }
 }
 
