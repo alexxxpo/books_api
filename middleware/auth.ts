@@ -15,8 +15,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
             return res.status(403).json({ error: 'Invalid token' })
         }
         
-        // @ts-expect-error
-        req.user = user;
+        req.body.user = user;
         
         next();
     })

@@ -11,6 +11,12 @@ export type UserType = {
     password?: string;
 }
 
+export type AuthUser = {
+    userId: number;
+    iat: number;
+    rights: number;
+}
+
 export type ResErrorType = {
     error: string;
 }

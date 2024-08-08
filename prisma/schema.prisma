@@ -26,12 +26,13 @@ model User {
   username String @unique
   email    String @unique
   password String
-  role     Roles  @relation(fields: [rolesId], references: [id])
-  rolesId  Int
+  role     Roles  @relation(fields: [rights], references: [rights])
+  rights   Int    @default(1)
 }
 
 model Roles {
-  id   Int    @id @default(autoincrement())
-  role String
-  user User[]
+  id     Int    @id @default(autoincrement())
+  role   String
+  rights Int    @unique
+  user   User[]
 }
