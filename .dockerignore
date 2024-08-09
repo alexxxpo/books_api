@@ -1,0 +1,15 @@
+#node modules
+node_modules
+
+#database data
+data
+
+#Production
+dist
+
+#env
+# .env
+
+#git
+.git
+.gitignore
