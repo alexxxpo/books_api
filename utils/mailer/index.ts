@@ -2,8 +2,9 @@ import nodemailer from "nodemailer";
 
 export async function mailer(to: string, link: string) {
 const transporter = nodemailer.createTransport({
+    //@ts-expect-error
     host: process.env.SMTP_HOST,
-    port: 465,
+    port: process.env.SMTP_PORT,
     //@ts-expect-error
     secure: process.env.SMTP_PORT == 465 ? true : false, // Use `true` for port 465, `false` for all other ports
     auth: {
