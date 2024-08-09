@@ -14,6 +14,7 @@ router.delete('/books/:id', authenticateToken, authorization(0b11), booksControl
 
 //User routes
 router.post('/users/register', userController.register);
+router.get('/users/confirm/:token', userController.confirmEmail);
 router.post('/users/login', userController.login);
 router.get('/users/me', authenticateToken, userController.current);
 router.put('/users/:id/role', authenticateToken, authorization(0b11), userController.changeRole);

@@ -3,29 +3,28 @@ import { AuthUser, UserType } from "../types";
 import { prisma } from '../prisma/prisma-client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { error } from 'console';
+import { mailer } from '../utils/mailer';
 
 class UserController {
-    async register(req: Request<{}, {}, UserType>, res: Response) {
+    public async register(req: Request<{}, {}, UserType>, res: Response) {
         const { email, password, username } = req.body;
-        if (!email || !password || !username) {
-            return res.status(400).json({ error: 'Все поля обязательны' })
-        }
-        try {
-            const existEmail = await prisma.user.findUnique({
-                where: { email }
-            })
-            if (existEmail) {
-                return res.status(400).json({ error: 'Пользователь с таким email уже зарегистрирован' })
-            }
-            const existUsername = await prisma.user.findUnique({
-                where: { username }
-            })
-            if (existUsername) {
-                return res.status(400).json({ error: 'Пользователь с таким именем уже зарегистрирован' })
-            }
+        if (!email || !password || !username) return res.status(400).json({ error: 'Все поля обязательны' });
 
-            const hashPassword = await bcrypt.hash(password, 10)
+        try {
+            const existEmail = await prisma.user.findUnique({ where: { email } });
+            if (existEmail) return res.status(400).json({ error: 'Пользователь с таким email уже зарегистрирован' });
+
+            const existUsername = await prisma.user.findUnique({ where: { username } });
+            if (existUsername) return res.status(400).json({ error: 'Пользователь с таким именем уже зарегистрирован' });
+
+            const hashPassword = await bcrypt.hash(password, 10);
+
+
+            const token = jwt.sign({ email }, process.env.SECRET_KEY as string, { expiresIn: 60 * 60 * 24 });
+
+            const confirmLink = 'http://' + process.env.HOST + '/users/confirm/' + token;
+
+            await mailer(email, confirmLink);
 
             const newUser = await prisma.user.create({
                 data: { email, username, password: hashPassword }
@@ -39,7 +38,7 @@ class UserController {
         }
     }
 
-    async login(req: Request, res: Response) {
+    public async login(req: Request, res: Response) {
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -67,7 +66,7 @@ class UserController {
 
     }
 
-    async current(req: Request<{}, {}, { user: AuthUser }>, res: Response) {
+    public async current(req: Request<{}, {}, { user: AuthUser }>, res: Response) {
         const { user } = req.body;
 
         const id = user.userId;
@@ -88,7 +87,7 @@ class UserController {
         return res.json(user)
     }
 
-    async changeRole(req: Request<{ id: number }, {}, { role: string, user: AuthUser }>, res: Response) {
+    public async changeRole(req: Request<{ id: number }, {}, { role: string, user: AuthUser }>, res: Response) {
         const id = +req.params.id
 
         if (!req.body.role) return res.status(204).json({ message: 'Роль не изменена' })
@@ -122,6 +121,27 @@ class UserController {
         }
 
 
+    }
+
+    public async confirmEmail(req: Request<{ token: string }>, res: Response) {
+        const token = req.params.token
+        jwt.verify(token, process.env.SECRET_KEY as string, async (err, data) => {
+            if (err) {
+                return res.status(403).json({ error: 'Invalid token' })
+            }
+            //@ts-expect-error
+            const email = data?.email as string
+            try {
+                const user = await prisma.user.findUnique({ where: { email: email } })
+    
+                if(!user) return res.status(404).json({error: 'Пользователь с таким email не зарегистрирован'})
+    
+                return res.status(202).json({message: `Email ${email} подтвержден`})                
+            } catch (error) {
+                console.error('Ошибка подтверждения email', error);
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        })
     }
 }
 
